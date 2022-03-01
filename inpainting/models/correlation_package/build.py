@@ -1,6 +1,6 @@
 import os
 import torch
-import torch.utils.ffi
+import torch.utils.cpp_extension.ffi
 
 this_folder = os.path.dirname(os.path.abspath(__file__)) + '/'
 
@@ -15,7 +15,7 @@ if torch.cuda.is_available() == True:
     Defines += [('WITH_CUDA', None)]
     Objects += ['src/correlation_cuda_kernel.o']
 
-ffi = torch.utils.ffi.create_extension(
+ffi = torch.utils.cpp_extension.ffi.create_extension(
     name='_ext.correlation',
     headers=Headers,
     sources=Sources,
