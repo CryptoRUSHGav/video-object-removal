@@ -1,6 +1,7 @@
 import os
 import torch
-import torch.utils.cpp_extension.ffi
+from setuptools import setup
+from torch.utils.cpp_extension import BuildExtension, CUDAExtension
 
 this_folder = os.path.dirname(os.path.abspath(__file__)) + '/'
 
@@ -15,17 +16,27 @@ if torch.cuda.is_available() == True:
     Defines += [('WITH_CUDA', None)]
     Objects += ['src/ChannelNorm_kernel.o']
 
-ffi = torch.utils.cpp_extension.ffi.create_extension(
-    name='_ext.channelnorm',
-    headers=Headers,
-    sources=Sources,
-    verbose=False,
-    with_cuda=True,
-    package=False,
-    relative_to=this_folder,
-    define_macros=Defines,
-    extra_objects=[os.path.join(this_folder, Object) for Object in Objects]
-)
-
 if __name__ == '__main__':
-    ffi.build()
+    setup(name='_ext.channelnorm', ext_modules=[
+        CUDAExtension(
+            name='_ext.channelnorm',
+            headers=Headers,
+            sources=Sources,
+            extra_objects=Objects
+        )],
+        cmdclass={'build_ext': BuildExtension})
+
+# ffi = torch.utils.cpp_extension.CppExtension(
+#     name='_ext.channelnorm',
+#     headers=Headers,
+#     sources=Sources,
+#     verbose=False,
+#     with_cuda=True,
+#     package=False,
+#     relative_to=this_folder,
+#     define_macros=Defines,
+#     extra_objects=[os.path.join(this_folder, Object) for Object in Objects]
+# )
+
+# if __name__ == '__main__':
+#     ffi.build()
